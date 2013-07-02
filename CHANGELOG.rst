@@ -9,6 +9,8 @@ Studio: Add table for tracking course creator permissions (not yet used).
 Update rake django-admin[syncdb] and rake django-admin[migrate] so they
 run for both LMS and CMS.
 
+Studio: Added support for uploading and managing PDF textbooks
+
 Common: Student information is now passed to the tracking log via POST instead of GET.
 
 Common: Add tests for documentation generation to test suite
