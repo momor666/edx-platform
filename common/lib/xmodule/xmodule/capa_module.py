@@ -22,6 +22,12 @@ from xblock.core import Scope, String, Boolean, Dict, Integer, Float
 from .fields import Timedelta, Date
 from django.utils.timezone import UTC
 
+from django.conf import settings
+
+# njp
+from xmodule.util.utils import get_course_for_item
+import ipdb
+
 log = logging.getLogger("mitx.courseware")
 
 
@@ -29,6 +35,27 @@ log = logging.getLogger("mitx.courseware")
 NUM_RANDOMIZATION_BINS = 20
 # Never produce more than this many different seeds, no matter what.
 MAX_RANDOMIZATION_BINS = 1000
+
+
+# njp - these functions and defs should go somewhere else most likely.
+# keys for these strings the custom dict
+CHECK_BUTTON_DEFAULT_KEY = "check_button_default_key"
+CHECK_BUTTON_FINAL_KEY = "check_button_final_key"
+
+def get_custom_words_dict(location):
+    """
+    Returns the custom_words dict from the course advanced settings, or None
+    if not set.
+    """
+    course = get_course_for_item(location)
+    #ipdb.set_trace()
+    # I think get_courseXXX fails hard if the course is not available,
+    # so it's not clear I should depend here on that existing. Still.
+    # Q: is there a way to check if .xyz is present on a course object efficiently
+    # without throwing AttributeError for the false case?
+    if course and course.custom_words:
+        return course.custom_words
+    return None
 
 
 def randomization_bin(seed, problem_id):
@@ -139,7 +166,6 @@ class CapaFields(object):
         help="Source code for LaTeX and Word problems. This feature is not well-supported.",
         scope=Scope.settings
     )
-
 
 class CapaModule(CapaFields, XModule):
     """
@@ -315,20 +341,32 @@ class CapaModule(CapaFields, XModule):
             'ajax_url': self.system.ajax_url,
             'progress': Progress.to_js_status_str(self.get_progress())
         })
-
+    
+    
+    # njp
     def check_button_name(self):
         """
         Determine the name for the "check" button.
 
         Usually it is just "Check", but if this is the student's
-        final attempt, change the name to "Final Check"
+        final attempt, change the name to "Final Check".
+        The names may be overridden by the course's custom words dict.
         """
-        if self.max_attempts is not None:
-            final_check = (self.attempts >= self.max_attempts - 1)
-        else:
-            final_check = False
+        
+        # Default button names
+        check = "Check"
+        final = "Final Check"
+        
+        # Custom overrides of the names
+        custom_words = get_custom_words_dict(self.location)
+        if custom_words:
+            check = custom_words.get(CHECK_BUTTON_DEFAULT_KEY, check)
+            final = custom_words.get(CHECK_BUTTON_FINAL_KEY, final)
 
-        return "Final Check" if final_check else "Check"
+        if self.max_attempts is not None and self.attempts >= self.max_attempts - 1:
+            return final
+        else:
+            return check
 
     def should_show_check_button(self):
         """

@@ -14,12 +14,16 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.util.date_utils import get_default_time_display
 
+# njp
+from xmodule.util.utils import get_course_for_item
+
+
 from xblock.core import Scope
 from util.json_request import expect_json
 
 from contentstore.module_info_model import get_module_info, set_module_info
 from contentstore.utils import get_modulestore, get_lms_link_for_item, \
-    compute_unit_state, UnitState, get_course_for_item
+    compute_unit_state, UnitState
 
 from models.settings.course_grading import CourseGradingModel
 

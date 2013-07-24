@@ -1,7 +1,11 @@
 from auth.authz import STAFF_ROLE_NAME, INSTRUCTOR_ROLE_NAME
 from auth.authz import is_user_in_course_group_role
 from django.core.exceptions import PermissionDenied
-from ..utils import get_course_location_for_item
+
+# njp
+#from ..utils import get_course_location_for_item
+from xmodule.util.utils import get_course_location_for_item
+
 from xmodule.modulestore import Location
 
 

@@ -10,7 +10,10 @@ from mitxmako.shortcuts import render_to_response
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.django import modulestore
-from ..utils import get_course_for_item
+
+from xmodule.util.utils import get_course_for_item
+##from ..utils import get_course_for_item
+
 from .access import get_location_and_verify_access
 
 __all__ = ['edit_tabs', 'reorder_static_tabs', 'static_pages', 'edit_static']

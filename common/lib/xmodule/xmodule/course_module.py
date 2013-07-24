@@ -181,6 +181,9 @@ class CourseFields(object):
     show_timezone = Boolean(help="True if timezones should be shown on dates in the courseware", scope=Scope.settings, default=True)
     enrollment_domain = String(help="External login method associated with user accounts allowed to register in course",
                         scope=Scope.settings)
+    custom_words = Dict(help="Dictionary of word customizations applied in specific spots:" +
+    					"check_button_default check_button_last", scope=Scope.settings)
+    # TODO: where to document what the custom word keys are, here?
 
     # An extra property is used rather than the wiki_slug/number because
     # there are courses that change the number for different runs. This allows
