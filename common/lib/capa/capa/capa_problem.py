@@ -385,7 +385,6 @@ class LoncapaProblem(object):
         # Q: not sure about multiple choicegroups in the tree .. what is that?
         # Q: could take tree param, or use self.tree as starting point
         shuffled = deepcopy(tree)
-        return shuffled
         for choicegroup in shuffled.xpath('//choicegroup'):
             #print(choicegroup.getchildren())
             
