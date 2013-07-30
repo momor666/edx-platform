@@ -24,6 +24,9 @@ from django.utils.timezone import UTC
 
 log = logging.getLogger("mitx.courseware")
 
+# njp
+import ipdb
+
 
 # Generate this many different variants of problems with rerandomize=per_student
 NUM_RANDOMIZATION_BINS = 20

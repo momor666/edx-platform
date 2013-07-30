@@ -52,6 +52,10 @@ html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hin
 
 log = logging.getLogger(__name__)
 
+
+import ipdb
+
+
 #-----------------------------------------------------------------------------
 # main class for this module
 
@@ -96,6 +100,9 @@ class LoncapaProblem(object):
         self.seed = state.get('seed', seed)
         assert self.seed is not None, "Seed must be provided for LoncapaProblem."
 
+        #import ipdb
+        #ipdb.set_trace()
+        
         self.student_answers = state.get('student_answers', {})
         if 'correct_map' in state:
             self.correct_map.set_dict(state['correct_map'])
@@ -121,6 +128,8 @@ class LoncapaProblem(object):
         # instances for each question in the problem. The dict has keys = xml subtree of
         # Response, values = Response instance
         self._preprocess_problem(self.tree)
+        
+
 
         if not self.student_answers:  # True when student_answers is an empty dict
             self.set_initial_display()
@@ -366,11 +375,48 @@ class LoncapaProblem(object):
             answer_ids.append(results.keys())
         return answer_ids
 
+
+    def shuffled_tree(self, tree):
+        """
+        Returns a tree modified to reflect multiple-choice shuffling.
+        """
+        # TBD: logic to decide if we shuffle
+        # TBD: integrate with the "seed" .. maybe need to fix that to change sometimes
+        # Q: not sure about multiple choicegroups in the tree .. what is that?
+        # Q: could take tree param, or use self.tree as starting point
+        shuffled = deepcopy(tree)
+        for choicegroup in shuffled.xpath('//choicegroup'):
+            #print(choicegroup.getchildren())
+            
+            # grab out to python list for general manipulation
+            ordering = list(choicegroup.getchildren())
+            
+            # remove all from parent
+            for choice in ordering:
+                choicegroup.remove(choice)
+            
+            # the last shall be first .. our test shuffle
+            last = ordering.pop(-1)
+            ordering.insert(0, last)
+            #print(ordering)
+            
+            for choice in ordering:
+                choicegroup.append(choice)
+                # Note: .insert(-1, choice) does not work correctly, but .append() does
+                
+            #print(choicegroup.getchildren())
+            #ipdb.set_trace()
+        return shuffled
+            
+        
+        
     def get_html(self):
         '''
         Main method called externally to get the HTML to be rendered for this capa Problem.
         '''
-        html = contextualize_text(etree.tostring(self._extract_html(self.tree)), self.context)
+        shuffled = self.shuffled_tree(self.tree)
+        html = contextualize_text(etree.tostring(self._extract_html(shuffled)), self.context)
+        #ipdb.set_trace()
         return html
 
     def handle_input_ajax(self, data):
@@ -620,6 +666,7 @@ class LoncapaProblem(object):
         '''
         response_id = 1
         self.responders = {}
+        #ipdb.set_trace() # njp
         for response in tree.xpath('//' + "|//".join(response_tag_dict)):
             response_id_str = self.problem_id + "_" + str(response_id)
             # create and save ID for this response
